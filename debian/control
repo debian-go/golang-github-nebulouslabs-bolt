@@ -1,0 +1,27 @@
+Source: golang-github-nebulouslabs-bolt
+Section: devel
+Priority: extra
+Maintainer: Debian Go Packaging Team <pkg-go-maintainers@lists.alioth.debian.org>
+Uploaders: Free Ekanayaka <freee@debian.org>
+Build-Depends: debhelper (>= 9),
+               dh-golang,
+               golang-go,
+Standards-Version: 3.9.8
+Homepage: https://github.com/nebulouslabs/bolt
+Vcs-Browser: https://anonscm.debian.org/cgit/pkg-go/packages/golang-github-nebulouslabs-bolt.git
+Vcs-Git: https://anonscm.debian.org/git/pkg-go/packages/golang-github-nebulouslabs-bolt.git
+XS-Go-Import-Path: github.com/NebulousLabs/bolt
+
+Package: golang-github-nebulouslabs-bolt-dev
+Architecture: all
+Built-Using: ${misc:Built-Using}
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+         golang-go
+Description: low-level key/value database for Go
+ Bolt is a pure Go key/value store inspired by Howard Chu's LMDB
+ project.
+ .
+ This package is a vendored fork and snapshot of github.com/boltdb/bolt,
+ maintained by NebulousLabs and used as a dependency for the sia storage
+ daemon.

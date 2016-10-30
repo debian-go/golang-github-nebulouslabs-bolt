@@ -1,0 +1,5 @@
+golang-github-nebulouslabs-bolt (1.0+git20160516.255.dfb2120-1) unstable; urgency=medium
+
+  * Initial release (Closes: #854882)
+
+ -- Free Ekanayaka <freee@debian.org>  Sun, 30 Oct 2016 15:07:36 +0000
