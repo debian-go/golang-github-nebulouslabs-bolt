@@ -364,6 +364,18 @@ func (tx *Tx) CopyFile(path string, mode os.FileMode) error {
 	return f.Close()
 }
 
+// FlushDBPages unmaps and re-mmaps the db file, flushing all of the DB's
+// pages from resident memory. It returns an error if called from a read-only
+// transaction.
+func (tx *Tx) FlushDBPages() error {
+	if tx.db == nil {
+		return ErrTxClosed
+	} else if !tx.writable {
+		return ErrTxNotWritable
+	}
+	return tx.db.mmap(tx.db.datasz)
+}
+
 // Check performs several consistency checks on the database for this transaction.
 // An error is returned if any inconsistency is found.
 //
@@ -381,7 +393,9 @@ func (tx *Tx) Check() <-chan error {
 func (tx *Tx) check(ch chan error) {
 	// Check if any pages are double freed.
 	freed := make(map[pgid]bool)
-	for _, id := range tx.db.freelist.all() {
+	all := make([]pgid, tx.db.freelist.count())
+	tx.db.freelist.copyall(all)
+	for _, id := range all {
 		if freed[id] {
 			ch <- fmt.Errorf("page %d: already freed", id)
 		}
