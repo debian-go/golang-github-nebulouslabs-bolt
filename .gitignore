@@ -1,1 +1,4 @@
-.pc
+*.prof
+*.test
+*.swp
+/bin/

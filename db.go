@@ -275,7 +275,12 @@ func (db *DB) mmap(minsz int) error {
 
 	// Memory-map the data file as a byte slice.
 	if err := mmap(db, size); err != nil {
-		return err
+		// mmap failed; the system may have run out of space. Fallback to
+		// mapping the bare minimum needed for the current db size.
+		if err2 := mmap(db, db.datasz); err2 != nil {
+			panic(fmt.Sprintf("failed to revert db size after failed mmap: %v", err2))
+		}
+		return MmapError(err.Error())
 	}
 
 	// Save references to the meta pages.
@@ -552,7 +557,10 @@ func (db *DB) removeTx(tx *Tx) {
 	// Remove the transaction.
 	for i, t := range db.txs {
 		if t == tx {
-			db.txs = append(db.txs[:i], db.txs[i+1:]...)
+			last := len(db.txs) - 1
+			db.txs[i] = db.txs[last]
+			db.txs[last] = nil
+			db.txs = db.txs[:last]
 			break
 		}
 	}
@@ -952,7 +960,7 @@ func (s *Stats) Sub(other *Stats) Stats {
 	diff.PendingPageN = s.PendingPageN
 	diff.FreeAlloc = s.FreeAlloc
 	diff.FreelistInuse = s.FreelistInuse
-	diff.TxN = other.TxN - s.TxN
+	diff.TxN = s.TxN - other.TxN
 	diff.TxStats = s.TxStats.Sub(&other.TxStats)
 	return diff
 }
